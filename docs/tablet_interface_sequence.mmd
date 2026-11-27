@@ -1,0 +1,82 @@
+sequenceDiagram
+    title 호출·얼굴 확인·용건 질문 기반 태블릿 인터페이스
+
+    participant TAB as Android 태블릿
+    participant IO as tablet_interface_node
+    participant DIA as dialogue_node
+    participant TM as task_manager_node
+    participant VIS as perception_node
+
+    rect rgb(230,245,255)
+        Note over TAB,VIS: 1. 호출과 사용자 확인
+
+        TAB->>IO: 마이크 오디오 전달 (WSS)
+        IO->>DIA: 호출어·음성 인식용 오디오 (Topic)
+        DIA->>DIA: Hello ROKEY 감지
+
+        DIA->>TM: 대화 시작 요청 (Service)
+        TM-->>DIA: 접수 여부·세션 정보 (Service 응답)
+
+        TM-->>IO: 카메라 화면 활성화 요청 (Topic)
+        IO-->>TAB: 카메라 화면 활성화 (WSS)
+
+        Note over TM: 사용자 관측 자세 이동 완료 후 얼굴 확인
+        TM->>VIS: 얼굴 확인 (Action)
+        VIS-->>IO: 실시간 카메라 영상 전달 (Topic)
+        IO-->>TAB: 실시간 카메라 화면 송출 (HTTPS)
+        VIS-->>TM: 등록 직원·얼굴 판독 결과 (Action 결과)
+
+        TM-->>IO: 이름을 포함한 인사·용건 질문 (Topic)
+        IO-->>TAB: 안녕하세요 OO님 무슨 일이신가요 (WSS)
+
+        Note over TAB: 카메라 영상 유지·인사 음성 출력
+    end
+
+    rect rgb(255,245,230)
+        Note over TAB,VIS: 2. 사용자 용건과 출근 인증
+
+        DIA->>DIA: 사용자 응답을 음성 인식·LLM으로 해석
+        DIA->>TM: 출근·복귀·외출·퇴근 요청 (Action)
+        TM-->>DIA: 작업 접수 또는 거절 (Action 응답)
+
+        opt 출근 요청
+            TM-->>IO: 출입증 제시 안내 (Topic)
+            IO-->>TAB: 출입증을 보여주세요 (WSS)
+
+            TM->>VIS: 출입증 소유자 확인 (Action)
+            VIS-->>TM: 카드 소유자·판독 결과 (Action 결과)
+            TM->>TM: 얼굴 직원과 카드 소유자 대조
+        end
+
+        TM-->>IO: 인증 결과·화면 모드·안내 문장 (Topic)
+        IO-->>TAB: 인증 결과·텍스트 화면 전환 안내 (WSS)
+
+        Note over TAB,IO: 인증 성공 시 카메라 미리보기 연결 종료
+        Note over TM: 미등록·카드 불일치는 거절 안내 후 작업 시작 차단
+    end
+
+    rect rgb(255,230,255)
+        Note over TAB,VIS: 3. 출근 시 수납 동의
+
+        opt 출근 인증 성공
+            TM-->>DIA: 현재 질문·계획·유효 기간 (Topic)
+            TM-->>IO: 출입증과 소지품 수납 동의 질문 (Topic)
+            IO-->>TAB: 질문 텍스트·음성 출력 (WSS)
+
+            DIA->>TM: 현재 질문에 대한 음성 응답 (Service)
+            TM-->>DIA: 응답 접수 또는 거절 (Service 응답)
+
+            Note over TAB: 사용자는 카드를 로봇 방향으로 눕혀 유지
+        end
+    end
+
+    rect rgb(230,255,230)
+        Note over TAB,VIS: 4. 작업 안내와 결과 출력
+
+        TM-->>IO: 물품 배치 안내·진행·완료·오류 (Topic)
+        IO-->>TAB: 안내 텍스트·음성 출력 (WSS)
+        TM-->>DIA: 작업 진행·최종 결과 (Action 피드백·결과)
+
+        Note over TAB,DIA: 작업 중 응답은 기존 오디오 경로 사용
+        Note over TAB,IO: 이용 종료 시 사용자 정보·음성 대기열 정리
+    end

@@ -1,0 +1,99 @@
+sequenceDiagram
+    title 하향 대기·사용자 확인·보관·반환 작업
+
+    participant TM as task_manager_node
+    participant VIS as perception_node
+    participant RE as 로봇 실행부
+
+    Note over RE: robot_executor_node → 두산·RG2 드라이버 호출
+    Note over RE: 초기 기본 상태는 아래 방향을 바라보는 대기 자세
+
+    rect rgb(230,245,255)
+        Note over TM,RE: 1. 호출에 응답하고 얼굴 확인
+
+        TM->>RE: 지정된 사용자 위치를 바라보는 자세 이동 (Action)
+        RE-->>TM: 이동 완료·현재 자세 (Action 결과)
+        TM->>VIS: 얼굴 확인 (Action)
+        VIS-->>TM: 등록 직원·판독 결과 (Action 결과)
+
+        Note over TM: 등록 직원이면 인사 후 용건 질문
+        Note over TM: 음성 요청 접수는 1번 인터페이스 경로 사용
+    end
+
+    rect rgb(255,230,255)
+        Note over TM,RE: 2. 출근 시 카드 대조·동의·인수
+
+        opt 출근 요청
+            TM->>VIS: 출입증 소유자 확인 (Action)
+            VIS-->>TM: 카드 소유자·판독 결과 (Action 결과)
+            TM->>TM: 얼굴 직원과 카드 소유자 일치 확인
+
+            Note over TM: 일치 시 출입증·소지품 수납 동의 확인
+            Note over TM,VIS: 동의 후 사용자가 카드를 눕혀 유지
+
+            TM->>VIS: 카드 집기 위치·자세 계산 (Action)
+            VIS-->>TM: 집기 위치·기울기·관측 유효성 (Action 결과)
+
+            TM->>RE: 좌표·자세 검증·IK 계산·카드 인수·보관 (단계별 Action)
+            RE-->>TM: 카드 파지·직원별 위치 배치 결과
+            TM->>TM: 성공한 카드 보관 상태 저장
+
+            Note over TM,RE: 카드 보관 중 사용자는 트레이에 물품을 비중첩 배치
+        end
+    end
+
+    rect rgb(230,255,230)
+        Note over TM,RE: 3. 출근·복귀 시 트레이 스캔과 수납
+
+        opt 출근 또는 복귀 요청
+            TM->>RE: 트레이 상부 이동·카메라 수직 조정 (Action)
+            RE-->>TM: 관측 자세 도달 결과
+            TM->>VIS: 트레이 스캔·물품 종류·위치 확인 (Action)
+            VIS-->>TM: 물품 목록·현재 위치 (Action 결과)
+
+            opt 물품이 하나 이상 있음
+                TM->>RE: 서랍 개방·물품별 수납·닫기 (단계별 Action)
+                RE-->>TM: 물품별 실행 결과
+                TM->>TM: 성공한 항목부터 보관 기록 갱신
+            end
+
+            Note over TM: 물품이 없으면 서랍 개폐·수납 생략
+            Note over TM: 복귀는 얼굴 확인만 수행·출입증 대조 생략
+        end
+    end
+
+    rect rgb(255,245,230)
+        Note over TM,RE: 4. 외출·퇴근 시 트레이 반환
+
+        opt 외출 또는 퇴근 요청
+            TM->>TM: 본인 인증·보관 목록·포함·제외 조건 확인
+            Note over TM: 퇴근은 출입증 필수 반환·외출은 출입증 보관 허용
+
+            opt 개인 물품 반환 필요
+                TM->>RE: 서랍 개방 (Action)
+                RE-->>TM: 개방 결과
+                TM->>VIS: 현재 영상에서 반환 대상 재탐색 (Action)
+                VIS-->>TM: 대상 위치·가림 여부
+
+                Note over TM,RE: 가림 시 임시 이동 → 재탐색 → 대상 전달 → 원복 순으로 조정
+            end
+
+            TM->>RE: 반환 대상 카드·물품을 트레이에 배치 (단계별 Action)
+            RE-->>TM: 물품별 전달·원복 결과
+            TM->>TM: 성공한 항목별 보관·반환 상태 갱신
+
+            opt 서랍을 열었음
+                TM->>RE: 서랍 닫기 (Action)
+                RE-->>TM: 닫기 결과
+            end
+        end
+    end
+
+    rect rgb(245,245,245)
+        Note over TM,RE: 5. 완료와 공통 조건
+
+        TM->>TM: 물품별 최종 결과 확정·사용자 안내
+        Note over RE: 개인 물품 입출고 시 RG2 Z축 수직 유지
+        Note over TM: 미등록·불일치·실패·불명확 결과는 후속 작업 보류
+        Note over TM: 퇴근 출입증 전달 미완료는 전체 성공으로 처리하지 않음
+    end

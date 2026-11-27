@@ -1,0 +1,6 @@
+string user_id
+# false includes UNKNOWN; true includes only currently confirmed STORED.
+bool stored_only
+---
+lockerbot_interfaces/OperationStatus status
+lockerbot_interfaces/ItemState[] items

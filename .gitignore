@@ -29,3 +29,17 @@ __pycache__/
 *.db-shm
 *.db3
 *.mcap
+
+# SQLite runtime files, including rollback journals and custom file extensions
+*.sqlite
+*.sqlite-*
+*.sqlite3-*
+*.db-*
+*.db3-*
+*.journal
+*.wal
+*.shm
+*-journal
+*-wal
+*-shm
+*.egg-info/

@@ -1,0 +1,35 @@
+# Goal: dialogue_node -> task_manager_node.
+string CHECK_IN=CHECK_IN
+string RETURN=RETURN
+string GO_OUT=GO_OUT
+string CHECK_OUT=CHECK_OUT
+
+string session_id
+# Client-generated stable task identity; reject a second active duplicate.
+string task_id
+string task_type
+string utterance
+# Empty include list means all eligible items, excluding exclude_item_ids.
+string[] include_item_ids
+string[] exclude_item_ids
+# Applies to GO_OUT only; CHECK_OUT must return the access card.
+bool return_access_card
+builtin_interfaces/Duration timeout
+---
+# Result: final whole-task outcome, including partial physical results.
+lockerbot_interfaces/OperationStatus status
+string task_id
+# Identity comes from verified session state, never from a claimed goal user ID.
+string user_id
+lockerbot_interfaces/ItemResult[] item_results
+# Known requested items without a confirmed successful final placement.
+string[] unresolved_item_ids
+---
+# Feedback: zero or more updates before the result.
+string task_id
+string stage
+float32 progress
+string current_item_id
+uint32 completed_items
+uint32 total_items
+string message

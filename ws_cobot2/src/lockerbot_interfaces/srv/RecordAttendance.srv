@@ -1,0 +1,4 @@
+lockerbot_interfaces/AttendanceEvent event
+---
+# OK includes an identical replay already saved by Storage.
+lockerbot_interfaces/OperationStatus status

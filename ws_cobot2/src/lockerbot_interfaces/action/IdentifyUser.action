@@ -1,0 +1,19 @@
+# Goal: task_manager_node -> perception_node.
+string FACE=FACE
+string BADGE_OWNER=BADGE_OWNER
+
+string session_id
+string mode
+builtin_interfaces/Duration timeout
+---
+# Result: identify the actual person/card owner; task manager compares identities.
+lockerbot_interfaces/OperationStatus status
+string user_id
+string display_name
+float32 confidence
+builtin_interfaces/Time observed_at
+---
+# Feedback
+string stage
+float32 progress
+string message

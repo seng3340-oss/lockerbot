@@ -1,0 +1,24 @@
+# Goal: task_manager_node -> perception_node.
+string BADGE_GRASP=BADGE_GRASP
+string SCAN_TRAY=SCAN_TRAY
+string FIND_ITEMS=FIND_ITEMS
+
+string session_id
+string task_id
+string mode
+string location_id
+# Required for FIND_ITEMS; individual DB identities, not detector class names.
+string[] target_item_ids
+builtin_interfaces/Duration timeout
+---
+# Result: a valid empty SCAN_TRAY is OK, not a detection error.
+lockerbot_interfaces/OperationStatus status
+lockerbot_interfaces/DetectedItem[] items
+# FIND_ITEMS targets not associated with a current observation.
+string[] missing_item_ids
+---
+# Feedback
+string stage
+float32 progress
+uint32 detected_count
+string message

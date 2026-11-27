@@ -1,0 +1,43 @@
+# Goal: task_manager_node -> robot_executor_node; one physical step per goal.
+string MOVE_NAMED_POSE=MOVE_NAMED_POSE
+string OPEN_DRAWER=OPEN_DRAWER
+string CLOSE_DRAWER=CLOSE_DRAWER
+string STORE_ITEM=STORE_ITEM
+string RETURN_ITEM=RETURN_ITEM
+string TEMP_MOVE_ITEM=TEMP_MOVE_ITEM
+string RESTORE_ITEM=RESTORE_ITEM
+
+string session_id
+string task_id
+string step_id
+string operation
+# MOVE_NAMED_POSE: standby_down, face_observation, tray_observation.
+string named_pose
+string user_id
+string item_id
+string source_location
+string target_location
+# Required for item transfers. Poses use metres and unit quaternions.
+geometry_msgs/PoseStamped pick_pose
+geometry_msgs/PoseStamped place_pose
+builtin_interfaces/Time observation_valid_until
+# Required for final STORE_ITEM/RETURN_ITEM event generation.
+string result_event_id
+string expected_updated_at
+builtin_interfaces/Duration timeout
+---
+# Result: reached_pose is populated only when reached_pose_valid is true.
+lockerbot_interfaces/OperationStatus status
+bool reached_pose_valid
+geometry_msgs/PoseStamped reached_pose
+# Only final STORE_ITEM/RETURN_ITEM may emit a persistent ItemResult.
+# A cancelled/failed step must still report a confirmed or UNKNOWN outcome
+# when an item operation was attempted; cancellation never implies rollback.
+bool has_item_result
+lockerbot_interfaces/ItemResult item_result
+---
+# Feedback
+string step_id
+string stage
+float32 progress
+string message

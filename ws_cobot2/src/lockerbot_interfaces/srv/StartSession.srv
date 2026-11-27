@@ -1,0 +1,10 @@
+# dialogue_node -> task_manager_node, after wake-word detection.
+string request_id
+string device_id
+string wake_word
+builtin_interfaces/Time detected_at
+---
+lockerbot_interfaces/OperationStatus status
+# Assigned by task manager; does not imply successful authentication.
+string session_id
+builtin_interfaces/Time expires_at

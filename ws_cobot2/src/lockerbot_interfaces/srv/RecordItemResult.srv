@@ -1,0 +1,5 @@
+lockerbot_interfaces/ItemResult result
+---
+# Storage acknowledgement; physical outcome is in request.result.outcome.
+# OK includes an identical replay; it does not change UNKNOWN into SUCCESS.
+lockerbot_interfaces/OperationStatus status

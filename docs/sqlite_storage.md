@@ -1,5 +1,7 @@
 # 출입·개별 물품 SQLite 기록 관리
 
+후속 통신 정의: `lockerbot_interfaces`의 `GetItems`, `RecordAttendance`, `RecordItemResult` 서비스와 `ItemState`, `ItemResult`, `AttendanceEvent` 메시지가 이 Python API에 대응한다. [ROS 2 인터페이스 문서](ros_interfaces.md)를 참고한다. 아래의 "인터페이스 미정/정의 제외" 설명은 저장 모듈 최초 구현 당시의 범위 기록이며, 저장 모듈은 계속 ROS 독립적으로 유지한다. ROS 서버·변환 어댑터는 아직 구현하지 않았다.
+
 작성·검증일: 2026-11-27 (한국 시각). 저장 모듈은 `ws_cobot2/src/lockerbot_storage/lockerbot_storage/database.py`에 있다. Python 표준 라이브러리만 사용하며 ROS2를 import하지 않는다.
 
 ## 범위와 설계 선택

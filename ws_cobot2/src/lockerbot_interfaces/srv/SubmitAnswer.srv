@@ -1,0 +1,17 @@
+string YES=YES
+string NO=NO
+string ITEMS=ITEMS
+string TEXT=TEXT
+
+# dialogue_node -> task_manager_node; retries preserve request_id and content.
+string request_id
+string session_id
+string task_id
+string question_id
+string answer_type
+string transcript
+string[] selected_item_ids
+builtin_interfaces/Time answered_at
+---
+# Accepted means the answer was consumed; not that the task succeeded.
+lockerbot_interfaces/OperationStatus status
